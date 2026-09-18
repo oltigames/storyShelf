@@ -147,3 +147,6 @@ dist
 /backend/.windsurf/
 /backend/.cursor/
 /backend/skills-lock.json
+
+# --- storyShelf: mobile ---
+/mobile/.claude/
