@@ -11,3 +11,92 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id            String         @id @default(uuid())
+  googleId      String         @unique
+  email         String         @unique
+  name          String
+  avatarUrl     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  accuracyVotes AccuracyVote[]
+  logs          Log[]
+}
+
+model Book {
+  id            String       @id @default(uuid())
+  // TODO need to decide on which API to use for books
+  externalId    String       @unique // unique Id for the book from the API
+  title         String
+  author        String
+  coverUrl      String?
+  publishedYear Int?
+  genre         String?
+  createdAt     DateTime     @default(now())
+  adaptations   Adaptation[]
+  logs          Log[]
+}
+
+model Movie {
+  id            String       @id @default(uuid())
+  // TODO need to decide on which API to use for movies
+  externalId    String       @unique
+  title         String
+  director      String?
+  posterUrl     String?
+  releaseYear   Int?
+  genre         String?
+  soundtrackUri String?
+  createdAt     DateTime     @default(now())
+  adaptations   Adaptation[]
+  logs          Log[]
+}
+
+model Adaptation {
+  id            String         @id @default(uuid())
+  bookId        String
+  book          Book           @relation(fields: [bookId], references: [id])
+  movieId       String
+  movie         Movie          @relation(fields: [movieId], references: [id])
+  approved      Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  accuracyVotes AccuracyVote[]
+
+  @@unique([bookId, movieId])
+}
+
+model AccuracyVote {
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  adaptationId String
+  adaptation   Adaptation @relation(fields: [adaptationId], references: [id])
+  // ! score must be in the range 1-5 but it has to be enforced in application code (zod) - Prisma has no range contraints
+  score        Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([userId, adaptationId])
+}
+
+enum MediaType {
+  BOOK
+  MOVIE
+}
+
+model Log {
+  // ! exactly one of bookId/movieId must be set, matching mediaType — enforced in application code, not by Prisma
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  mediaType MediaType
+  bookId    String?
+  book      Book?     @relation(fields: [bookId], references: [id])
+  movieId   String?
+  movie     Movie?    @relation(fields: [movieId], references: [id])
+  status    String?
+  rating    Int?
+  review    String?
+  loggedAt  DateTime  @default(now())
+}
