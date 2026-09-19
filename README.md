@@ -23,6 +23,7 @@ subsequent sessions (it's a no-op if the container is already running).
 cd backend
 cp .env.example .env   # fill in real values first time
 npm install
+npx prisma migrate dev   # creates/updates the database tables
 npm run dev
 ```
 
@@ -43,5 +44,21 @@ Expected output:
 ```bash
 cd mobile
 npm install
-npm run ios     # or: npm run android / npm run web
+npx expo start
 ```
+
+This starts the Metro bundler and opens an interactive menu in your
+terminal. From there, press:
+
+- **`i`** — opens the app in the iOS Simulator, running on your Mac.
+  Requires Xcode to be fully installed (Xcode > Settings, or the App
+  Store) — the CLI will prompt you to install it if it isn't.
+- **`a`** — same, but for the Android Emulator (requires Android Studio).
+- Scan the QR code shown in the terminal with your phone's camera
+  (iOS) or the Expo Go app (Android) to run it on a physical device
+  instead — no simulator/emulator install needed. Your phone must be
+  on the same Wi-Fi network as your laptop.
+- **`w`** — opens the app in a browser tab via React Native Web.
+
+Alternatively, `npm run ios` / `npm run android` / `npm run web` skip
+the menu and launch a specific target directly.
